@@ -38,7 +38,7 @@ public class RocketDataUI : MonoBehaviour
   void UpdateThrottle()
   {
     RocketController rocketController = rocket.GetComponent<RocketController>();
-    int throttlePercentage = (int)(rocketController.getThrottle() * 100);
+    int throttlePercentage = (int)(rocketController.GetThrottle() * 100);
 
     throttleTextUI.text = "Throttle: " + throttlePercentage + "%";
   }
