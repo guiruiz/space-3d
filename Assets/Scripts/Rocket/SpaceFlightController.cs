@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SpaceFlightController : FlightController
 {
-  public SpaceFlightController(GameObject rocket, GameObject planet) : base(rocket, planet)
+  public SpaceFlightController(GameObject rocket) : base(rocket)
   { }
 
   int yawSpeed = 40;

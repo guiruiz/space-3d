@@ -15,32 +15,29 @@ public class RocketController : MonoBehaviour
 
   private Rigidbody rigidBody;
 
-  private float maxSpeed = 30f;
-
-  void setFlightMode(FlightMode mode)
+  void Awake()
   {
-    if (mode == FlightMode.Space)
-    {
-      flightController = spaceFlightController;
-    }
-    else if (mode == FlightMode.Planet)
-    {
-      flightController = planetFlightController;
-    }
+    EventManager.OnGravityFieldEnter += OnGravityFieldEnter;
+    EventManager.OnGravityFieldExit += OnGravityFieldExit;
+  }
 
-    flightMode = mode;
+  void OnDestroy()
+  {
+    EventManager.OnGravityFieldEnter -= OnGravityFieldEnter;
+    EventManager.OnGravityFieldExit -= OnGravityFieldExit;
   }
 
   void Start()
   {
-    spaceFlightController = new SpaceFlightController(gameObject, planet);
-    planetFlightController = new PlanetFlightController(gameObject, planet);
+    spaceFlightController = new SpaceFlightController(gameObject);
+    planetFlightController = new PlanetFlightController(gameObject);
 
-    setFlightMode(FlightMode.Planet);
-
+    setFlightMode(FlightMode.Space);
 
     rigidBody = this.GetComponent<Rigidbody>();
+
     // Set ship in orbit at alt 97m (y = 200)
+    // float maxSpeed = 30f;
     //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
   }
 
@@ -69,8 +66,38 @@ public class RocketController : MonoBehaviour
     flightController.ControlShip();
   }
 
+  void setFlightMode(FlightMode mode, PlanetController planet = null)
+  {
+    planetFlightController.SetPlanet(planet);
+    if (mode == FlightMode.Space)
+    {
+      flightController = spaceFlightController;
+    }
+    else if (mode == FlightMode.Planet)
+    {
+      flightController = planetFlightController;
+    }
+
+    flightMode = mode;
+  }
+
+
+  public FlightMode GetFlightMode()
+  {
+    return flightMode;
+  }
   public float GetThrottle()
   {
     return flightController.GetThrottle();
+  }
+
+  public void OnGravityFieldEnter(PlanetController planet)
+  {
+    setFlightMode(FlightMode.Planet, planet);
+  }
+
+  public void OnGravityFieldExit(PlanetController planet)
+  {
+    setFlightMode(FlightMode.Space);
   }
 }

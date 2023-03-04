@@ -5,7 +5,6 @@ using UnityEngine;
 public class RocketDataUI : MonoBehaviour
 {
   public GameObject rocket;
-  public GameObject planet;
   public TMPro.TMP_Text throttleTextUI;
   public TMPro.TMP_Text altituteTextUI;
   public TMPro.TMP_Text velocityTextUI;
@@ -13,12 +12,27 @@ public class RocketDataUI : MonoBehaviour
   public TMPro.TMP_Text pitchTextUI;
   public TMPro.TMP_Text rollTextUI;
   public TMPro.TMP_Text yawTextUI;
+  public TMPro.TMP_Text flightModeTextUI;
+  public TMPro.TMP_Text planetTextUI;
 
-  int altitudeOffset = 104; // @todo Calculate offset dinamicaly
+  int altitudeOffset = 0; // @todo Calculate offset dinamicaly
   private float time;
   private float altitude = 0;
   private float lastAltitudeM = 0;
   float velocityRate = 10f;
+  private PlanetController planet;
+
+  void Awake()
+  {
+    EventManager.OnGravityFieldEnter += OnGravityFieldEnter;
+    EventManager.OnGravityFieldExit += OnGravityFieldExit;
+  }
+
+  void OnDestroy()
+  {
+    EventManager.OnGravityFieldEnter -= OnGravityFieldEnter;
+    EventManager.OnGravityFieldExit -= OnGravityFieldExit;
+  }
 
   void Start()
   {
@@ -32,8 +46,19 @@ public class RocketDataUI : MonoBehaviour
     UpdateVelocity();
     UpdateSpeed();
     UpdateRotation();
+    UpdateFlightMode();
+    UpdatePlanet();
   }
 
+  public void OnGravityFieldEnter(PlanetController planet)
+  {
+    this.planet = planet;
+  }
+
+  public void OnGravityFieldExit(PlanetController planet)
+  {
+    this.planet = null;
+  }
 
   void UpdateThrottle()
   {
@@ -53,13 +78,14 @@ public class RocketDataUI : MonoBehaviour
 
   void UpdateAltitude()
   {
+    if (!planet) { return; }
+
     Rigidbody rb1 = rocket.GetComponent<Rigidbody>();
     Rigidbody rb2 = planet.GetComponent<Rigidbody>();
 
 
     Vector3 direction = rb1.position - rb2.position;
     float distance = direction.magnitude;
-    ;
 
     float alt = distance - altitudeOffset;
     alt = Mathf.Max(alt, 0);
@@ -100,4 +126,24 @@ public class RocketDataUI : MonoBehaviour
       lastAltitudeM = altitude;
     }
   }
+
+  void UpdateFlightMode()
+  {
+    RocketController rocketController = rocket.GetComponent<RocketController>();
+    flightModeTextUI.text = "Mode: " + rocketController.GetFlightMode();
+  }
+
+  void UpdatePlanet()
+  {
+    if (!planet)
+    {
+      planetTextUI.text = "Planet: None";
+      return;
+    }
+
+
+    planetTextUI.text = "Planet: " + planet.name;
+  }
+
+
 }

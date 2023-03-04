@@ -5,8 +5,13 @@ using UnityEngine;
 
 public class PlanetFlightController : FlightController
 {
-  public PlanetFlightController(GameObject rocket, GameObject planet) : base(rocket, planet)
+  public PlanetFlightController(GameObject rocket) : base(rocket)
   { }
+
+  private PlanetController planet;
+  float throttle = .5f;
+  float maxSpeed = 30;
+  int yawSpeed = 50;
 
   override public void ControlShip()
   {
@@ -23,16 +28,13 @@ public class PlanetFlightController : FlightController
 
   override public float GetThrottle()
   {
-    return .5f;
+    return throttle;
   }
-
-  float throttle = .5f;
-
-  float maxSpeed = 30;
-  int yawSpeed = 50;
 
   public void RotationControl()
   {
+    if (!planet) { return; }
+
     Vector3 gravityUp = (transform.position - planet.transform.position).normalized;
     Vector3 rocketUp = transform.up;
 
@@ -57,6 +59,11 @@ public class PlanetFlightController : FlightController
     {
       // rigidBody.MovePosition(rigidBody.position + transform.TransformDirection(-Vector3.forward) * horizontalSpeed * Time.deltaTime);
       rigidBody.AddForce(transform.TransformDirection(-Vector3.forward) * maxSpeed);
+    }
+    else if (Input.GetKey(KeyCode.S))
+    {
+      //rigidBody.MovePosition(rigidBody.position + transform.TransformDirection(Vector3.left) * horizontalSpeed * Time.deltaTime);
+      rigidBody.AddForce(transform.TransformDirection(Vector3.forward) * maxSpeed);
     }
 
     if (Input.GetKeyUp(KeyCode.W))
@@ -85,5 +92,11 @@ public class PlanetFlightController : FlightController
       rigidBody.velocity = Vector3.zero;
       throttle = .5f;
     }
+  }
+
+
+  public void SetPlanet(PlanetController planet)
+  {
+    this.planet = planet;
   }
 }
