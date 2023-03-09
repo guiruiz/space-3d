@@ -15,7 +15,7 @@ public class RocketDataUI : MonoBehaviour
   public TMPro.TMP_Text flightModeTextUI;
   public TMPro.TMP_Text planetTextUI;
 
-  int altitudeOffset = 0; // @todo Calculate offset dinamicaly
+  int altitudeOffset = 0; // @todo Calculate offset dinamicaly or use raycast to calculate distance
   private float time;
   private float altitude = 0;
   private float lastAltitudeM = 0;

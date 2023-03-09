@@ -58,12 +58,12 @@ public class PlanetFlightController : FlightController
     if (Input.GetKey(KeyCode.W))
     {
       // rigidBody.MovePosition(rigidBody.position + transform.TransformDirection(-Vector3.forward) * horizontalSpeed * Time.deltaTime);
-      rigidBody.AddForce(transform.TransformDirection(-Vector3.forward) * maxSpeed);
+      rigidBody.AddForce(transform.TransformDirection(Vector3.forward) * maxSpeed);
     }
     else if (Input.GetKey(KeyCode.S))
     {
       //rigidBody.MovePosition(rigidBody.position + transform.TransformDirection(Vector3.left) * horizontalSpeed * Time.deltaTime);
-      rigidBody.AddForce(transform.TransformDirection(Vector3.forward) * maxSpeed);
+      rigidBody.AddForce(transform.TransformDirection(-Vector3.forward) * maxSpeed);
     }
 
     if (Input.GetKeyUp(KeyCode.W))

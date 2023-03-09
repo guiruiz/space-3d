@@ -6,8 +6,6 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
-  public GameObject planet;
-
   private FlightMode flightMode;
   private FlightController flightController;
   private SpaceFlightController spaceFlightController;
@@ -37,8 +35,7 @@ public class RocketController : MonoBehaviour
     rigidBody = this.GetComponent<Rigidbody>();
 
     // Set ship in orbit at alt 97m (y = 200)
-    // float maxSpeed = 30f;
-    //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
+    rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
   }
 
   void Update()
@@ -53,12 +50,11 @@ public class RocketController : MonoBehaviour
     }
 
     // Set max speed
+    // float maxSpeed = 30f;
     // if (rigidBody.velocity.magnitude > maxSpeed)
     // {
     //   rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
     // }
-
-
   }
 
   void FixedUpdate()
@@ -93,11 +89,13 @@ public class RocketController : MonoBehaviour
 
   public void OnGravityFieldEnter(PlanetController planet)
   {
-    setFlightMode(FlightMode.Planet, planet);
+    // disable planet flight mode switcher
+    //setFlightMode(FlightMode.Planet, planet);
   }
 
   public void OnGravityFieldExit(PlanetController planet)
   {
-    setFlightMode(FlightMode.Space);
+    // disable planet flight mode switcher
+    //setFlightMode(FlightMode.Space);
   }
 }

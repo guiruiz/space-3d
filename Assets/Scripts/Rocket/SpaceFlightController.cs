@@ -33,31 +33,31 @@ public class SpaceFlightController : FlightController
   public void FlightControl()
   {
     // ROLL
-    if (Input.GetKey(KeyCode.A))
-    {
-      transform.Rotate(-Vector3.forward * rollSpeed * Time.deltaTime);
-    }
-    else if (Input.GetKey(KeyCode.D))
+    if (Input.GetKey(KeyCode.Q))
     {
       transform.Rotate(Vector3.forward * rollSpeed * Time.deltaTime);
+    }
+    else if (Input.GetKey(KeyCode.E))
+    {
+      transform.Rotate(-Vector3.forward * rollSpeed * Time.deltaTime);
     }
 
     // PITCH
     if (Input.GetKey(KeyCode.W))
     {
-      transform.Rotate(-Vector3.right * pitchSpeed * Time.deltaTime);
+      transform.Rotate(Vector3.right * pitchSpeed * Time.deltaTime);
     }
     else if (Input.GetKey(KeyCode.S))
     {
-      transform.Rotate(Vector3.right * pitchSpeed * Time.deltaTime);
+      transform.Rotate(-Vector3.right * pitchSpeed * Time.deltaTime);
     }
 
     // YAW
-    if (Input.GetKey(KeyCode.Q))
+    if (Input.GetKey(KeyCode.A))
     {
       transform.Rotate(-Vector3.up * yawSpeed * Time.deltaTime);
     }
-    else if (Input.GetKey(KeyCode.E))
+    else if (Input.GetKey(KeyCode.D))
     {
       transform.Rotate(Vector3.up * yawSpeed * Time.deltaTime);
     }
@@ -94,7 +94,7 @@ public class SpaceFlightController : FlightController
   {
     if (throttle > 0.02f)
     {
-      rigidBody.AddForce(transform.TransformDirection(-Vector3.forward) * maxThrust * throttle);
+      rigidBody.AddForce(transform.TransformDirection(Vector3.forward) * maxThrust * throttle);
     }
   }
 

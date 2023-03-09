@@ -28,18 +28,28 @@ public class PlanetController : MonoBehaviour
 
   void Attract()
   {
-    if (!shouldAttract) { return; }
+    //if (!shouldAttract) { return; }
+
+    if (!objectToAttract) { return; }
 
     Rigidbody rbToAttract = objectToAttract.GetComponent<Rigidbody>();
 
-    Vector3 direction = rb.position - rbToAttract.position;
-    float distance = direction.magnitude;
-
-    float forceMagnitude = G * (rb.mass * rbToAttract.mass) / Mathf.Pow(distance, 2);
-    Vector3 force = direction.normalized * forceMagnitude;
+    Vector3 force = CalculateGravity(rbToAttract.position, rbToAttract.mass);
 
     rbToAttract.AddForce(force);
   }
+
+  public Vector3 CalculateGravity(Vector3 position, float mass)
+  {
+    Vector3 direction = rb.position - position;
+    float distance = direction.magnitude;
+
+    float forceMagnitude = G * (rb.mass * mass) / Mathf.Pow(distance, 2);
+    Vector3 force = direction.normalized * forceMagnitude;
+
+    return force;
+  }
+
   void Rotation()
   {
     transform.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
