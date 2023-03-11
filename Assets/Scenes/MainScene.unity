@@ -1523,9 +1523,6 @@ MonoBehaviour:
   rocket: {fileID: 7440004208975989880}
   pathPointModel: {fileID: 520368357467613529, guid: c672b06a6684b4047b118efe1a8e0d02, type: 3}
   shouldDisplay: 1
-  line: {fileID: 1459177511}
-  maxPhysicsFrameIterations: 100
-  prefab: {fileID: 7440004208975989880}
 --- !u!4 &1459177510
 Transform:
   m_ObjectHideFlags: 0
