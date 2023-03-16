@@ -12,6 +12,9 @@ public class RocketController : MonoBehaviour
   private PlanetFlightController planetFlightController;
 
   public CelestialBody startBody;
+  private CelestialBody landedBody;
+
+  public bool startLanded = true;
 
   private Rigidbody rigidBody;
 
@@ -67,9 +70,16 @@ public class RocketController : MonoBehaviour
 
   void FixedUpdate()
   {
-    Vector3 gravity = Universe.CalculateAcceleration(rigidBody.position);
-    //Debug.Log("ShipGravity" + gravity);
-    rigidBody.AddForce(gravity, ForceMode.Acceleration);
+
+    if (landedBody)
+    {
+      rigidBody.velocity = landedBody.velocity;
+    }
+    else
+    {
+      Vector3 gravity = Universe.CalculateAcceleration(rigidBody.position);
+      rigidBody.AddForce(gravity, ForceMode.Acceleration);
+    }
 
     flightController.ControlShip();
   }
@@ -113,7 +123,31 @@ public class RocketController : MonoBehaviour
 
   void TeleportToBody(CelestialBody body)
   {
-    rigidBody.velocity = body.velocity;
-    rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
+    if (startLanded)
+    {
+      rigidBody.velocity = body.velocity;
+      float shipHeight = GetComponent<Collider>().bounds.size.y; //@Todo find a better way
+      float altitude = body.radius / 2 + shipHeight / 2;
+
+      // Start Landed
+      rigidBody.MovePosition(body.transform.position + new Vector3(0, altitude, 0));
+      landedBody = body;
+    }
+    else
+    {
+      // Start Flying
+      rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
+    }
   }
+
+
+  void OnTriggerEnter(Collider col)
+  {
+    if (col.gameObject.tag == "CelestialBody")
+    {
+      Debug.Log("Hiiiiiiit");
+      landedBody = col.GetComponent<CelestialBody>();
+    }
+  }
+
 }

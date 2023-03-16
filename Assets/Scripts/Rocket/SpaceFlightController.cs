@@ -14,7 +14,7 @@ public class SpaceFlightController : FlightController
 
   float throttle = 0;
   float throttleSensitivity = .2f;
-  float maxThrust = 20f;
+  public float maxThrust = 1000f;
 
   override public void ControlShip()
   {
@@ -23,6 +23,7 @@ public class SpaceFlightController : FlightController
     FlightControl();
     ThrottleControl();
     ThrustControl();
+    Debug.Log(throttle);
   }
 
   override public float GetThrottle()

@@ -4,25 +4,34 @@ using UnityEngine;
 
 public class TimeController : MonoBehaviour
 {
-  public float timeScale = 1f;
-  float fasterTimeScale = 100f;
+
+  public float currentTimeScale = 1f;
 
   void Update()
   {
-    if (Input.GetKeyDown(KeyCode.T))
+    float newTimeScale = default;
+
+    if (Input.GetKeyDown(KeyCode.Keypad1))
     {
-      if (Time.timeScale != 1f)
-      {
-
-        timeScale = 1f;
-      }
-      else
-      {
-        timeScale = fasterTimeScale;
-
-      }
+      newTimeScale = 1f;
+    }
+    else if (Input.GetKeyDown(KeyCode.Keypad2))
+    {
+      newTimeScale = 10f;
+    }
+    else if (Input.GetKeyDown(KeyCode.Keypad3))
+    {
+      newTimeScale = 50f;
+    }
+    else if (Input.GetKeyDown(KeyCode.Keypad4))
+    {
+      newTimeScale = 100f;
     }
 
-    Time.timeScale = timeScale;
+    if (newTimeScale != default)
+    {
+      currentTimeScale = newTimeScale;
+      Time.timeScale = newTimeScale;
+    }
   }
 }
