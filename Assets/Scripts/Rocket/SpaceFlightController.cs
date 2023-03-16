@@ -94,7 +94,7 @@ public class SpaceFlightController : FlightController
   {
     if (throttle > 0.02f)
     {
-      rigidBody.AddForce(transform.TransformDirection(Vector3.forward) * maxThrust * throttle);
+      rigidBody.AddForce(transform.TransformDirection(Vector3.up) * maxThrust * throttle);
     }
   }
 

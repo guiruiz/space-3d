@@ -44,6 +44,7 @@ public class CelestialBody : MonoBehaviour
   void OnValidate()
   {
     mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
+    Debug.Log(gameObject.name + mass);
     meshHolder = transform.GetChild(0);
     meshHolder.localScale = Vector3.one * radius;
   }

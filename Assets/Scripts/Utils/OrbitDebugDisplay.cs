@@ -22,6 +22,7 @@ public class OrbitDebugDisplay : MonoBehaviour
     {
       HideOrbits();
     }
+
   }
 
   void Update()
@@ -88,23 +89,23 @@ public class OrbitDebugDisplay : MonoBehaviour
 
       if (useThickLines)
       {
-        var lineRenderer = bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer>();
+        var lineRenderer = bodies[bodyIndex].gameObject.GetComponent<LineRenderer>();
         lineRenderer.enabled = true;
         lineRenderer.positionCount = drawPoints[bodyIndex].Length;
         lineRenderer.SetPositions(drawPoints[bodyIndex]);
-        lineRenderer.startColor = pathColour;
-        lineRenderer.endColor = pathColour;
         lineRenderer.widthMultiplier = width;
       }
       else
       {
         for (int i = 0; i < drawPoints[bodyIndex].Length - 1; i++)
         {
-          Debug.DrawLine(drawPoints[bodyIndex][i], drawPoints[bodyIndex][i + 1], pathColour);
+          //Debug.DrawLine(drawPoints[bodyIndex][i], drawPoints[bodyIndex][i + 1], pclor);
+
+
         }
 
         // Hide renderer
-        var lineRenderer = bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer>();
+        var lineRenderer = bodies[bodyIndex].gameObject.GetComponent<LineRenderer>();
         if (lineRenderer)
         {
           lineRenderer.enabled = false;
@@ -114,18 +115,19 @@ public class OrbitDebugDisplay : MonoBehaviour
     }
   }
 
-  Vector3 CalculateAcceleration(int i, VirtualBody[] virtualBodies)
+  Vector3 CalculateAcceleration(int i, VirtualBody[] bodies)
   {
     Vector3 acceleration = Vector3.zero;
-    for (int j = 0; j < virtualBodies.Length; j++)
+    for (int j = 0; j < bodies.Length; j++)
     {
       if (i == j)
       {
         continue;
       }
-      Vector3 forceDir = (virtualBodies[j].position - virtualBodies[i].position).normalized;
-      float sqrDst = (virtualBodies[j].position - virtualBodies[i].position).sqrMagnitude;
-      acceleration += forceDir * Universe.gravitationalConstant * virtualBodies[j].mass / sqrDst;
+
+      Vector3 forceDir = (bodies[j].position - bodies[i].position).normalized;
+      float sqrDst = (bodies[j].position - bodies[i].position).sqrMagnitude;
+      acceleration += forceDir * Universe.gravitationalConstant * bodies[j].mass / sqrDst;
     }
     return acceleration;
   }
@@ -137,7 +139,7 @@ public class OrbitDebugDisplay : MonoBehaviour
     // Draw paths
     for (int bodyIndex = 0; bodyIndex < bodies.Length; bodyIndex++)
     {
-      var lineRenderer = bodies[bodyIndex].gameObject.GetComponentInChildren<LineRenderer>();
+      var lineRenderer = bodies[bodyIndex].gameObject.GetComponent<LineRenderer>();
       lineRenderer.positionCount = 0;
     }
   }

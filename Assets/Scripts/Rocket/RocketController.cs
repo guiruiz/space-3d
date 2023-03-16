@@ -11,6 +11,8 @@ public class RocketController : MonoBehaviour
   private SpaceFlightController spaceFlightController;
   private PlanetFlightController planetFlightController;
 
+  public CelestialBody startBody;
+
   private Rigidbody rigidBody;
 
   void Awake()
@@ -34,8 +36,14 @@ public class RocketController : MonoBehaviour
 
     rigidBody = this.GetComponent<Rigidbody>();
 
+    if (startBody)
+    {
+      TeleportToBody(startBody);
+    }
+
     // Set ship in orbit at alt 97m (y = 200)
-    rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
+    //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
+
   }
 
   void Update()
@@ -59,6 +67,10 @@ public class RocketController : MonoBehaviour
 
   void FixedUpdate()
   {
+    Vector3 gravity = Universe.CalculateAcceleration(rigidBody.position);
+    //Debug.Log("ShipGravity" + gravity);
+    rigidBody.AddForce(gravity, ForceMode.Acceleration);
+
     flightController.ControlShip();
   }
 
@@ -97,5 +109,11 @@ public class RocketController : MonoBehaviour
   {
     // disable planet flight mode switcher
     //setFlightMode(FlightMode.Space);
+  }
+
+  void TeleportToBody(CelestialBody body)
+  {
+    rigidBody.velocity = body.velocity;
+    rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
   }
 }
