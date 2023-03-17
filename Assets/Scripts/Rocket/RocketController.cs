@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
-  public CelestialBody targetBody;
+  public CelestialBody startingBody;
   public bool startLanded = true;
 
   private CelestialBody landedBody;
@@ -30,10 +30,12 @@ public class RocketController : MonoBehaviour
     spaceFlightController = new SpaceFlightController(gameObject);
     rigidBody = this.GetComponent<Rigidbody>();
 
-    if (targetBody)
+    if (startingBody)
     {
-      TeleportToBody(targetBody);
+      TeleportToBody(startingBody);
     }
+
+
 
     // Set ship in orbit at alt 97m (y = 200)
     //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
@@ -62,8 +64,67 @@ public class RocketController : MonoBehaviour
       rigidBody.AddForce(gravity, ForceMode.Acceleration);
     }
 
+
     spaceFlightController.ControlShip();
+
+    if (landedBody && spaceFlightController.GetThrottle() > 0f)
+    {
+      landedBody = null;
+    }
+
   }
+
+
+  void TeleportToBody(CelestialBody body)
+  {
+    rigidBody.velocity = body.velocity;
+
+    if (startLanded)
+    {
+      float shipHeight = GetComponent<Collider>().bounds.size.y; //@Todo find a better way
+      float altitude = body.radius / 2 + shipHeight / 2;
+
+      // Start Landed
+      rigidBody.MovePosition(body.transform.position + new Vector3(0, altitude, 0));
+      landedBody = body;
+    }
+    else
+    {
+      // Start Flying
+      rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
+    }
+  }
+
+  public FlightMode GetFlightMode()
+  {
+    return FlightMode.Space;
+  }
+  public float GetThrottle()
+  {
+    return spaceFlightController.GetThrottle();
+  }
+
+  public void OnGravityFieldEnter(PlanetController planet)
+  {
+    // disable planet flight mode switcher
+    //setFlightMode(FlightMode.Planet, planet);
+  }
+
+  public void OnGravityFieldExit(PlanetController planet)
+  {
+    // disable planet flight mode switcher
+    //setFlightMode(FlightMode.Space);
+  }
+
+
+  void OnTriggerEnter(Collider col)
+  {
+    if (col.gameObject.tag == "CelestialBody")
+    {
+      landedBody = col.GetComponent<CelestialBody>();
+    }
+  }
+
 
   // void SwitchFlightMode()
   // {
@@ -91,55 +152,5 @@ public class RocketController : MonoBehaviour
 
   //   flightMode = mode;
   // }
-
-
-  public FlightMode GetFlightMode()
-  {
-    return FlightMode.Space;
-  }
-  public float GetThrottle()
-  {
-    return spaceFlightController.GetThrottle();
-  }
-
-  public void OnGravityFieldEnter(PlanetController planet)
-  {
-    // disable planet flight mode switcher
-    //setFlightMode(FlightMode.Planet, planet);
-  }
-
-  public void OnGravityFieldExit(PlanetController planet)
-  {
-    // disable planet flight mode switcher
-    //setFlightMode(FlightMode.Space);
-  }
-
-  void TeleportToBody(CelestialBody body)
-  {
-    if (startLanded)
-    {
-      rigidBody.velocity = body.velocity;
-      float shipHeight = GetComponent<Collider>().bounds.size.y; //@Todo find a better way
-      float altitude = body.radius / 2 + shipHeight / 2;
-
-      // Start Landed
-      rigidBody.MovePosition(body.transform.position + new Vector3(0, altitude, 0));
-      landedBody = body;
-    }
-    else
-    {
-      // Start Flying
-      rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
-    }
-  }
-
-  void OnTriggerEnter(Collider col)
-  {
-    if (col.gameObject.tag == "CelestialBody")
-    {
-      Debug.Log("Hiiiiiiit");
-      landedBody = col.GetComponent<CelestialBody>();
-    }
-  }
 
 }
