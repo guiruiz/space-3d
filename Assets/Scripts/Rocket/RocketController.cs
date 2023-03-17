@@ -6,16 +6,11 @@ using UnityEngine;
 
 public class RocketController : MonoBehaviour
 {
-  private FlightMode flightMode;
-  private FlightController flightController;
-  private SpaceFlightController spaceFlightController;
-  private PlanetFlightController planetFlightController;
-
-  public CelestialBody startBody;
-  private CelestialBody landedBody;
-
+  public CelestialBody targetBody;
   public bool startLanded = true;
 
+  private CelestialBody landedBody;
+  private SpaceFlightController spaceFlightController;
   private Rigidbody rigidBody;
 
   void Awake()
@@ -33,33 +28,19 @@ public class RocketController : MonoBehaviour
   void Start()
   {
     spaceFlightController = new SpaceFlightController(gameObject);
-    planetFlightController = new PlanetFlightController(gameObject);
-
-    setFlightMode(FlightMode.Space);
-
     rigidBody = this.GetComponent<Rigidbody>();
 
-    if (startBody)
+    if (targetBody)
     {
-      TeleportToBody(startBody);
+      TeleportToBody(targetBody);
     }
 
     // Set ship in orbit at alt 97m (y = 200)
     //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
-
   }
 
   void Update()
   {
-    if (Input.GetKey(KeyCode.O))
-    {
-      setFlightMode(FlightMode.Space);
-    }
-    else if (Input.GetKey(KeyCode.P))
-    {
-      setFlightMode(FlightMode.Planet);
-    }
-
     // Set max speed
     // float maxSpeed = 30f;
     // if (rigidBody.velocity.magnitude > maxSpeed)
@@ -81,32 +62,44 @@ public class RocketController : MonoBehaviour
       rigidBody.AddForce(gravity, ForceMode.Acceleration);
     }
 
-    flightController.ControlShip();
+    spaceFlightController.ControlShip();
   }
 
-  void setFlightMode(FlightMode mode, PlanetController planet = null)
-  {
-    planetFlightController.SetPlanet(planet);
-    if (mode == FlightMode.Space)
-    {
-      flightController = spaceFlightController;
-    }
-    else if (mode == FlightMode.Planet)
-    {
-      flightController = planetFlightController;
-    }
+  // void SwitchFlightMode()
+  // {
+  //   if (Input.GetKey(KeyCode.O))
+  //   {
+  //     setFlightMode(FlightMode.Space);
+  //   }
+  //   else if (Input.GetKey(KeyCode.P))
+  //   {
+  //     setFlightMode(FlightMode.Planet);
+  //   }
+  // }
 
-    flightMode = mode;
-  }
+  // void setFlightMode(FlightMode mode, PlanetController planet = null)
+  // {
+  //   planetFlightController.SetPlanet(planet);
+  //   if (mode == FlightMode.Space)
+  //   {
+  //     flightController = spaceFlightController;
+  //   }
+  //   else if (mode == FlightMode.Planet)
+  //   {
+  //     flightController = planetFlightController;
+  //   }
+
+  //   flightMode = mode;
+  // }
 
 
   public FlightMode GetFlightMode()
   {
-    return flightMode;
+    return FlightMode.Space;
   }
   public float GetThrottle()
   {
-    return flightController.GetThrottle();
+    return spaceFlightController.GetThrottle();
   }
 
   public void OnGravityFieldEnter(PlanetController planet)
@@ -139,7 +132,6 @@ public class RocketController : MonoBehaviour
       rigidBody.MovePosition(body.transform.position + (transform.position - body.transform.position).normalized * body.radius * 2);
     }
   }
-
 
   void OnTriggerEnter(Collider col)
   {

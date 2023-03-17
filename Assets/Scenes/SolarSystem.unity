@@ -32792,7 +32792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startBody: {fileID: 1563283723}
-  startLanded: 0
+  startLanded: 1
 --- !u!1 &5968617729634683368
 GameObject:
   m_ObjectHideFlags: 0
