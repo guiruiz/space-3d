@@ -35,14 +35,14 @@ public class RocketController : MonoBehaviour
       TeleportToBody(startingBody);
     }
 
-
-
     // Set ship in orbit at alt 97m (y = 200)
     //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
   }
 
   void Update()
   {
+    spaceFlightController.Update();
+
     // Set max speed
     // float maxSpeed = 30f;
     // if (rigidBody.velocity.magnitude > maxSpeed)
@@ -65,13 +65,13 @@ public class RocketController : MonoBehaviour
     }
 
 
-    spaceFlightController.ControlShip();
 
     if (landedBody && spaceFlightController.GetThrottle() > 0f)
     {
       landedBody = null;
     }
 
+    spaceFlightController.FixedUpdate();
   }
 
 

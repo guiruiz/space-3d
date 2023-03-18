@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SpaceFlightController : FlightController
@@ -13,17 +10,30 @@ public class SpaceFlightController : FlightController
   int rollSpeed = 40;
 
   float throttle = 0;
-  float throttleSensitivity = .2f;
+  float throttleSensitivity = .4f;
   public float maxThrust = 1000f;
 
   override public void ControlShip()
   {
     //rigidBody.isKinematic = false;
 
-    FlightControl();
+    RotationControl();
     ThrottleControl();
-    ThrustControl();
+    Thrust();
+  }
+
+
+
+  public void Update()
+  {
+    RotationControl();
+    ThrottleControl();
+
     Debug.Log(throttle);
+  }
+  public void FixedUpdate()
+  {
+    Thrust();
   }
 
   override public float GetThrottle()
@@ -31,7 +41,34 @@ public class SpaceFlightController : FlightController
     return throttle;
   }
 
-  public void FlightControl()
+  public void ThrottleControl()
+  {
+    float t = throttle;
+
+    if (Input.GetKey(KeyCode.X))
+    {
+      t = 0;
+    }
+    else if (Input.GetKey(KeyCode.Z))
+    {
+      t = 1;
+    }
+    else if (Input.GetKey(KeyCode.LeftShift))
+    {
+      t = throttle + Time.deltaTime * throttleSensitivity;
+    }
+    else if (Input.GetKey(KeyCode.LeftControl))
+    {
+      t = throttle - Time.deltaTime * throttleSensitivity;
+    }
+
+    t = Mathf.Clamp(t, 0, 1f);
+
+
+    throttle = t;
+  }
+
+  public void RotationControl()
   {
     // ROLL
     if (Input.GetKey(KeyCode.Q))
@@ -64,34 +101,9 @@ public class SpaceFlightController : FlightController
     }
   }
 
-  public void ThrottleControl()
-  {
-    float t = throttle;
-
-    if (Input.GetKey(KeyCode.X))
-    {
-      t = 0;
-    }
-    else if (Input.GetKey(KeyCode.Z))
-    {
-      t = 1;
-    }
-    else if (Input.GetKey(KeyCode.LeftShift))
-    {
-      t = throttle + Time.deltaTime * throttleSensitivity;
-    }
-    else if (Input.GetKey(KeyCode.LeftControl))
-    {
-      t = throttle - Time.deltaTime * throttleSensitivity;
-    }
-
-    t = Mathf.Clamp(t, 0, 1f);
 
 
-    throttle = t;
-  }
-
-  public void ThrustControl()
+  public void Thrust()
   {
     if (throttle > 0.02f)
     {
