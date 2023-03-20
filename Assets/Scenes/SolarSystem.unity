@@ -32959,7 +32959,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingBody: {fileID: 1563283723}
-  startLanded: 0
+  shouldStartLanded: 0
 --- !u!64 &5816149066380856636
 MeshCollider:
   m_ObjectHideFlags: 0

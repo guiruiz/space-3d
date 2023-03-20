@@ -7,7 +7,7 @@ using UnityEngine;
 public class RocketController : MonoBehaviour
 {
   public CelestialBody startingBody;
-  public bool startLanded = true;
+  public bool shouldStartLanded = true;
 
   private CelestialBody landedBody;
   private SpaceFlightController spaceFlightController;
@@ -32,7 +32,7 @@ public class RocketController : MonoBehaviour
 
     if (startingBody)
     {
-      TeleportToBody(startingBody);
+      TeleportToBody(startingBody, shouldStartLanded);
     }
 
     // Set ship in orbit at alt 97m (y = 200)
@@ -41,6 +41,12 @@ public class RocketController : MonoBehaviour
 
   void Update()
   {
+    if (landedBody && spaceFlightController.GetThrottle() > 0f)
+    {
+      landedBody = null;
+    }
+
+
     spaceFlightController.Update();
 
     // Set max speed
@@ -53,7 +59,6 @@ public class RocketController : MonoBehaviour
 
   void FixedUpdate()
   {
-
     if (landedBody)
     {
       rigidBody.velocity = landedBody.velocity;
@@ -64,18 +69,11 @@ public class RocketController : MonoBehaviour
       rigidBody.AddForce(gravity, ForceMode.Acceleration);
     }
 
-
-
-    if (landedBody && spaceFlightController.GetThrottle() > 0f)
-    {
-      landedBody = null;
-    }
-
     spaceFlightController.FixedUpdate();
   }
 
 
-  void TeleportToBody(CelestialBody body)
+  void TeleportToBody(CelestialBody body, bool startLanded)
   {
     rigidBody.velocity = body.velocity;
 
