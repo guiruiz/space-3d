@@ -8,7 +8,7 @@ public class CameraOrbit : MonoBehaviour
   private float rotationY = 180;
   private float rotationX = 20;
   public Transform target;
-
+  [SerializeField]
   private float distanceFromTarget = 150f;
 
   private Vector3 currentRotation;
@@ -16,7 +16,7 @@ public class CameraOrbit : MonoBehaviour
 
   [SerializeField]
   private float defaultSmoothTime = 0.2f;
-
+  [SerializeField]
   private Vector2 zoomMinMax = new Vector2(30, 300);
   void Start()
   {
