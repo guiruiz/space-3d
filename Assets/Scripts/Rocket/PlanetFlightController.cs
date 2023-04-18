@@ -66,7 +66,7 @@ public class PlanetFlightController : FlightController
       rigidBody.AddForce(transform.TransformDirection(-Vector3.forward) * maxSpeed);
     }
 
-    if (Input.GetKeyUp(KeyCode.W))
+    if (Input.GetKeyUp(KeyCode.X)) // it set as W, might fix the bug, @todo: enable n try out.
     {
       rigidBody.velocity = Vector3.zero;
     }
