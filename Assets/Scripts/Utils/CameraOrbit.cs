@@ -5,8 +5,8 @@ public class CameraOrbit : MonoBehaviour
   [SerializeField]
   private float mouseSensitivity = 3f;
 
-  private float rotationY = 180;
-  private float rotationX = 20;
+  private float rotationY = 270;
+  private float rotationX = 15;
   public Transform target;
   [SerializeField]
   private float distanceFromTarget = 150f;
@@ -25,6 +25,8 @@ public class CameraOrbit : MonoBehaviour
   }
   void Update()
   {
+
+    Debug.Log(rotationX + " - " + rotationY);
     OrbitCamera(defaultSmoothTime);
     ZoomCamera();
   }

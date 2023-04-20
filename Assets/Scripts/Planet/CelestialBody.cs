@@ -1,18 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using UnityEditor;
 using UnityEngine;
+
 
 [ExecuteInEditMode]
 [RequireComponent(typeof(Rigidbody))]
 public class CelestialBody : MonoBehaviour
 {
-  public float radius;
+  public float diameter;
   public float surfaceGravity;
   public Vector3 initialVelocity;
   Transform meshHolder;
 
   public Vector3 velocity { get; private set; }
-  public float mass { get; private set; }
+
+  [SerializeField, ReadOnly]
+  public float mass = 0;
   public new Rigidbody rigidbody;
 
   void Start()
@@ -43,17 +48,15 @@ public class CelestialBody : MonoBehaviour
 
   void OnValidate()
   {
-    mass = surfaceGravity * radius * radius / Universe.gravitationalConstant;
-    Debug.Log(gameObject.name + mass);
+    mass = surfaceGravity * diameter * diameter / Universe.gravitationalConstant;
     meshHolder = transform.GetChild(0);
-    meshHolder.localScale = Vector3.one * radius;
+    meshHolder.localScale = Vector3.one * diameter;
   }
 
   public void UpdatePosition(float timeStep)
   {
     rigidbody.position += velocity * timeStep;
   }
-
 
   public void SetInitialVelocity(CelestialBody[] allBodies)
   {
@@ -68,6 +71,11 @@ public class CelestialBody : MonoBehaviour
         this.rigidbody.velocity += this.transform.right * Mathf.Sqrt((Universe.gravitationalConstant * m2) / r);
       }
     }
+  }
+
+  public float getRadius()
+  {
+    return diameter / 2;
   }
 
   public Vector3 Position
