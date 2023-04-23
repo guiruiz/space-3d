@@ -32,7 +32,7 @@ public class ShipTeleporter : MonoBehaviour
 
   public void ResetShip()
   {
-
+    ship.Throttle = 0;
     TeleportToBody(destination, shouldStartLanded);
   }
 

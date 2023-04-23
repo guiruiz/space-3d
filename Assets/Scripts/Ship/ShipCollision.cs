@@ -63,7 +63,6 @@ public class ShipCollision : MonoBehaviour
         float angle = CalculateCollisionAngle(collision);
         ship.Velocity = body.velocity;
 
-        Debug.Log("angle: " + angle);
         Vector3 normal = collision.contacts[0].normal;
         if (angle > 0)
         {
