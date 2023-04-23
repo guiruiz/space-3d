@@ -8,13 +8,13 @@ public class ShipTeleporter : MonoBehaviour
   public bool shouldStartLanded = true;
   public int altitudeMultiplier = 1;
 
-  private FlightController flightController;
+  private Ship ship;
   private Rigidbody rb;
 
   void Start()
   {
-    rb = this.GetComponent<Rigidbody>();
-    flightController = this.GetComponent<FlightController>();
+    rb = GetComponent<Rigidbody>();
+    ship = GetComponent<Ship>();
 
     if (destination)
     {
@@ -38,7 +38,7 @@ public class ShipTeleporter : MonoBehaviour
 
   void TeleportToBody(CelestialBody body, bool startLanded)
   {
-    flightController.velocity = body.velocity;
+    ship.Velocity = body.velocity;
 
     if (startLanded)
     {

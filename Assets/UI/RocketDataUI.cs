@@ -62,9 +62,9 @@ public class RocketDataUI : MonoBehaviour
 
   void UpdateThrottle()
   {
-    FlightController flightController = rocket.GetComponent<FlightController>();
-    int throttlePercentage = (int)(flightController.GetThrottle() * 100);
-
+    ShipFlight shipFlight = rocket.GetComponent<ShipFlight>();
+    //int throttlePercentage = (int)(flightController.GetThrottle() * 100);
+    int throttlePercentage = 10; // @TODO fix
     throttleTextUI.text = "Throttle: " + throttlePercentage + "%";
   }
   void UpdateRotation()
