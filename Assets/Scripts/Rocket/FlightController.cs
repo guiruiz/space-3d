@@ -3,7 +3,10 @@ using UnityEngine;
 public class FlightController : MonoBehaviour
 {
   public float maxThrust = 100f;
-  public float throttle { get; private set; } = 0;
+
+  [SerializeField, ReadOnly]
+
+  private float throttle = 0;
 
   [SerializeField, ReadOnly]
   public Vector3 velocity = Vector3.zero;
@@ -26,15 +29,19 @@ public class FlightController : MonoBehaviour
 
   public void Update()
   {
-    if (landedBody)
+    RotationControl();
+    if (landedBody == null)
     {
-      TakeOff();
     }
     else
     {
-      RotationControl();
-      ThrottleControl();
+      if (throttle > 0)
+      {
+        landedBody = null;
+      }
     }
+
+    ThrottleControl();
   }
 
   public void FixedUpdate()
@@ -127,6 +134,16 @@ public class FlightController : MonoBehaviour
     rb.position += velocity * Universe.physicsTimeStep;
   }
 
+  public float rotationSpeed = 20.0f; // Rotation speed
+
+  void RotateTo(Vector3 target)
+  {
+    // @TODO create rotationTarget, move rotation logic to Fixed and refactor RotationControl
+    Quaternion targetRotation = Quaternion.FromToRotation(transform.up, target) * transform.rotation;
+
+    transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+  }
+
   public float CalculateCollisionImpact(Collision collision)
   {
     float impactForce = 0.0f;
@@ -147,31 +164,31 @@ public class FlightController : MonoBehaviour
     return angle;
   }
 
-  private float maxLandingForce = 10f;
+  private float maxLandingForce = 25f;
   private float maxLandingAngle = 20f;
   private float maxImpactForce = 30f;
-  private float rebounceFactor = .1f;
-  private float takeOffFactor = 5f;
+  private float rebounceFactor = .5f;
+
+  [SerializeField, ReadOnly]
   private CelestialBody landedBody;
 
+  private float clippingThreshold = 0.1f;
+  private float antiClippingForce = 1.0f;
 
-  private void TakeOff()
-  {
-    if (Input.GetKey(KeyCode.F))
-    {
-      Vector3 takeOffForce = transform.up * landedBody.surfaceGravity * takeOffFactor;
-
-      Debug.Log("Taking Off..." + landedBody.surfaceGravity + " Force:" + takeOffForce);
-
-      landedBody = null;
-      velocity += takeOffForce;
-    }
-  }
 
   private void LandShip(CelestialBody body)
   {
     landedBody = body;
     throttle = 0;
+    Debug.Log("Ship Landed");
+  }
+
+  private void RebounceShip(CelestialBody body)
+  {
+    Vector3 relativeVelocity = velocity - body.velocity;
+    Vector3 rebounceForce = relativeVelocity * rebounceFactor;
+    velocity = body.velocity + (-rebounceForce);
+    Debug.Log("Rebounce force: " + rebounceForce);
   }
 
   private void OnCollisionEnter(Collision collision)
@@ -188,24 +205,17 @@ public class FlightController : MonoBehaviour
       Debug.Log("IMPACT angle: " + impactAngle + ", force: " + impactForce);
       if (impactForce > maxImpactForce || impactAngle > maxLandingAngle)
       {
+        // Explode Ship
         GetComponent<ShipTeleporter>().ResetShip();
         return;
       }
 
-      if (impactForce > maxLandingForce)
-      {
-        //Rebounce Ship
-        Vector3 relativeVelocity = velocity - body.velocity;
-        Vector3 rebounceForce = relativeVelocity * rebounceFactor;
-        velocity = body.velocity + (-rebounceForce);
-      }
-      else
-      {
-        LandShip(body);
-      }
+      // if (impactForce > maxLandingForce)
+      // {
+      //   RebounceShip(body);
+      // }
 
-      //Debug.DrawLine(rb.position, (rb.position + (transform.up * 100)), Color.green, 5f);
-      //Debug.DrawLine(rb.position, (rb.position + (normal * 100)), Color.red, 5f);
+      LandShip(body);
     }
   }
 
@@ -215,16 +225,42 @@ public class FlightController : MonoBehaviour
     {
       CelestialBody body = collision.gameObject.GetComponent<CelestialBody>();
 
-      if (landedBody == body)
+      if (body != null)
       {
         float angle = CalculateCollisionAngle(collision);
-        Debug.Log("STAY angle: " + angle);
-
-        //Rotate gradually to angle 0
-
         velocity = body.velocity;
+
+
+        Debug.Log("angle: " + angle);
+        Vector3 normal = collision.contacts[0].normal;
+        if (angle > 0)
+        {
+
+          //Rotate gradually to angle 0
+          RotateTo(normal);
+        }
       }
 
+
+    }
+
+    AvoidCliping(collision);
+  }
+
+
+  void AvoidCliping(Collision collision)
+  {
+    foreach (ContactPoint contact in collision.contacts)
+    {
+      Vector3 normal = contact.normal; // Get collision normal
+      Vector3 moveForce = -normal * antiClippingForce; // Calculate move direction away from the collision
+      float distance = contact.separation; // Get distance between colliders
+
+      if (distance < clippingThreshold)
+      {
+        // Apply force to move the object away from the collision
+        AddForce(moveForce);
+      }
     }
   }
 }

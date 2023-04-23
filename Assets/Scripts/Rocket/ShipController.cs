@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
-  public CelestialBody landedBody;
   private Rigidbody rb;
 
   void Awake()
@@ -21,9 +20,6 @@ public class ShipController : MonoBehaviour
   void Start()
   {
     rb = this.GetComponent<Rigidbody>();
-
-    // Set ship in orbit at alt 97m (y = 200)
-    //rigidBody.AddForce(transform.TransformDirection(Vector3.left) * 1500f);
   }
 
   void Update()
@@ -34,23 +30,10 @@ public class ShipController : MonoBehaviour
     // {
     //   rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
     // }
-
-
   }
 
   void FixedUpdate()
   {
-    if (landedBody)
-    {
-      //rigidBody.velocity = landedBody.velocity;
-    }
-
-    //Vector3 gravity = Universe.CalculateAcceleration(rb.position);
-    //rb.AddForce(gravity + (landedBody.velocity - rb.velocity), ForceMode.Acceleration);
-
-
-    //Vector3 velocity = (rb.velocity + gravity) * Universe.physicsTimeStep;
-    //rb.position += velocity * Universe.physicsTimeStep;
 
   }
 
@@ -72,20 +55,4 @@ public class ShipController : MonoBehaviour
       //rb.velocity = landedBody.velocity;
     }
   }
-
-  //public float decelerationFactor = 0.5f; // Deceleration factor to control how much the ship should decelerate upon collision
-  // private void OnCollisionEnter(Collision collision)
-  // {
-  //   Debug.Log("asdasd");
-  //   if (collision.gameObject.CompareTag("CelestialBody")) // Check if colliding with the planet
-  //   {
-  //     Vector3 collisionNormal = collision.contacts[0].normal; // Get the normal of the collision point
-
-  //     // Calculate deceleration force
-  //     Vector3 decelerationForce = -rb.velocity.normalized * decelerationFactor * rb.mass;
-
-  //     // Apply deceleration force to the ship
-  //     rb.AddForce(decelerationForce, ForceMode.Force);
-  //   }
-  // }
 }
