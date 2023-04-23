@@ -2,30 +2,45 @@ using UnityEngine;
 
 public class FlightController : MonoBehaviour
 {
-  int yawSpeed = 40;
-  int pitchSpeed = 40;
-  int rollSpeed = 40;
-
-  float throttleSensitivity = .4f;
   public float maxThrust = 100f;
   public float throttle { get; private set; } = 0;
 
-  private Rigidbody rigidBody;
+  [SerializeField, ReadOnly]
+  public Vector3 velocity = Vector3.zero;
+
+  private Rigidbody rb;
+  private int yawSpeed = 40;
+  private int pitchSpeed = 40;
+  private int rollSpeed = 40;
+
+  private float throttleSensitivity = .4f;
+
 
   public void Start()
   {
-    this.rigidBody = GetComponent<Rigidbody>();
+    this.rb = GetComponent<Rigidbody>();
+  }
+  void Awake()
+  {
   }
 
   public void Update()
   {
-    RotationControl();
-    ThrottleControl();
+    if (landedBody)
+    {
+      TakeOff();
+    }
+    else
+    {
+      RotationControl();
+      ThrottleControl();
+    }
   }
 
   public void FixedUpdate()
   {
-    Thrust();
+    UpdateVelocity();
+    UpdatePosition();
   }
 
   public float GetThrottle()
@@ -92,11 +107,124 @@ public class FlightController : MonoBehaviour
     }
   }
 
-  public void Thrust()
+  public void AddForce(Vector3 force, float mass = 1f)
   {
-    if (throttle > 0.02f)
+    Vector3 acceleration = force / mass;
+    velocity += acceleration * Universe.physicsTimeStep;
+  }
+
+  public void UpdateVelocity()
+  {
+    Vector3 gravity = Universe.CalculateAcceleration(rb.position);
+    Vector3 v = (velocity + gravity) * Universe.physicsTimeStep;
+
+    Vector3 t = transform.TransformDirection(Vector3.up) * (maxThrust * throttle);
+    AddForce(gravity + t);
+  }
+
+  public void UpdatePosition()
+  {
+    rb.position += velocity * Universe.physicsTimeStep;
+  }
+
+  public float CalculateCollisionImpact(Collision collision)
+  {
+    float impactForce = 0.0f;
+    foreach (ContactPoint contact in collision.contacts)
     {
-      rigidBody.AddForce(transform.TransformDirection(Vector3.up) * maxThrust * throttle, ForceMode.Acceleration);
+      CelestialBody body = collision.gameObject.GetComponent<CelestialBody>();
+      Vector3 relativeVelocity = velocity - body.velocity;
+      impactForce += relativeVelocity.magnitude * collision.rigidbody.mass;
+    }
+
+    return impactForce;
+  }
+
+  public float CalculateCollisionAngle(Collision collision)
+  {
+    Vector3 normal = collision.contacts[0].normal;
+    float angle = Vector3.Angle(transform.up, normal);
+    return angle;
+  }
+
+  private float maxLandingForce = 10f;
+  private float maxLandingAngle = 20f;
+  private float maxImpactForce = 30f;
+  private float rebounceFactor = .1f;
+  private float takeOffFactor = 5f;
+  private CelestialBody landedBody;
+
+
+  private void TakeOff()
+  {
+    if (Input.GetKey(KeyCode.F))
+    {
+      Vector3 takeOffForce = transform.up * landedBody.surfaceGravity * takeOffFactor;
+
+      Debug.Log("Taking Off..." + landedBody.surfaceGravity + " Force:" + takeOffForce);
+
+      landedBody = null;
+      velocity += takeOffForce;
+    }
+  }
+
+  private void LandShip(CelestialBody body)
+  {
+    landedBody = body;
+    throttle = 0;
+  }
+
+  private void OnCollisionEnter(Collision collision)
+  {
+
+    if (collision.gameObject.CompareTag("CelestialBody"))
+    {
+      CelestialBody body = collision.gameObject.GetComponent<CelestialBody>();
+      float impactForce = CalculateCollisionImpact(collision);
+      float impactAngle = CalculateCollisionAngle(collision);
+
+
+
+      Debug.Log("IMPACT angle: " + impactAngle + ", force: " + impactForce);
+      if (impactForce > maxImpactForce || impactAngle > maxLandingAngle)
+      {
+        GetComponent<ShipTeleporter>().ResetShip();
+        return;
+      }
+
+      if (impactForce > maxLandingForce)
+      {
+        //Rebounce Ship
+        Vector3 relativeVelocity = velocity - body.velocity;
+        Vector3 rebounceForce = relativeVelocity * rebounceFactor;
+        velocity = body.velocity + (-rebounceForce);
+      }
+      else
+      {
+        LandShip(body);
+      }
+
+      //Debug.DrawLine(rb.position, (rb.position + (transform.up * 100)), Color.green, 5f);
+      //Debug.DrawLine(rb.position, (rb.position + (normal * 100)), Color.red, 5f);
+    }
+  }
+
+  private void OnCollisionStay(Collision collision)
+  {
+    if (collision.gameObject.CompareTag("CelestialBody"))
+    {
+      CelestialBody body = collision.gameObject.GetComponent<CelestialBody>();
+
+      if (landedBody == body)
+      {
+        float angle = CalculateCollisionAngle(collision);
+        Debug.Log("STAY angle: " + angle);
+
+        //Rotate gradually to angle 0
+
+        velocity = body.velocity;
+      }
+
     }
   }
 }

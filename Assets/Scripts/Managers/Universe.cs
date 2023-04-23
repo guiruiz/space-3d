@@ -6,7 +6,7 @@ public class Universe : MonoBehaviour
 {
   static Universe instance;
 
-  public const float gravitationalConstant = 0.0001f;
+  public const float gravitationalConstant = 0.0001f; // 6.67430e-11f
   public const float physicsTimeStep = 0.01f;
 
   CelestialBody[] bodies;

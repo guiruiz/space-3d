@@ -25,8 +25,6 @@ public class CameraOrbit : MonoBehaviour
   }
   void Update()
   {
-
-    Debug.Log(rotationX + " - " + rotationY);
     OrbitCamera(defaultSmoothTime);
     ZoomCamera();
   }

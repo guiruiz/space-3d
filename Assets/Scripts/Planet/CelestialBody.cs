@@ -9,20 +9,22 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class CelestialBody : MonoBehaviour
 {
+
   public float diameter;
   public float surfaceGravity;
+
   public Vector3 initialVelocity;
-  Transform meshHolder;
-
-  public Vector3 velocity { get; private set; }
-
+  [SerializeField, ReadOnly]
+  public Vector3 velocity;
   [SerializeField, ReadOnly]
   public float mass = 0;
-  public new Rigidbody rigidbody;
+
+  public Rigidbody rb { get; private set; }
+  private Transform meshHolder;
 
   void Start()
   {
-    rigidbody = GetComponent<Rigidbody>();
+    rb = GetComponent<Rigidbody>();
   }
 
   void Awake()
@@ -36,8 +38,8 @@ public class CelestialBody : MonoBehaviour
     {
       if (otherBody != this)
       {
-        float sqrDst = (otherBody.rigidbody.position - rigidbody.position).sqrMagnitude;
-        Vector3 forceDir = (otherBody.rigidbody.position - rigidbody.position).normalized;
+        float sqrDst = (otherBody.rb.position - rb.position).sqrMagnitude;
+        Vector3 forceDir = (otherBody.rb.position - rb.position).normalized;
         Vector3 force = forceDir * Universe.gravitationalConstant * mass * otherBody.mass / sqrDst;
 
         Vector3 acceleration = force / mass;
@@ -55,7 +57,7 @@ public class CelestialBody : MonoBehaviour
 
   public void UpdatePosition(float timeStep)
   {
-    rigidbody.position += velocity * timeStep;
+    rb.position += velocity * timeStep;
   }
 
   public void SetInitialVelocity(CelestialBody[] allBodies)
@@ -68,7 +70,7 @@ public class CelestialBody : MonoBehaviour
         float r = Vector3.Distance(this.transform.position, otherBody.transform.position);
         this.transform.LookAt(otherBody.transform);
 
-        this.rigidbody.velocity += this.transform.right * Mathf.Sqrt((Universe.gravitationalConstant * m2) / r);
+        this.rb.velocity += this.transform.right * Mathf.Sqrt((Universe.gravitationalConstant * m2) / r);
       }
     }
   }
@@ -82,7 +84,7 @@ public class CelestialBody : MonoBehaviour
   {
     get
     {
-      return rigidbody.position;
+      return rb.position;
     }
   }
 
